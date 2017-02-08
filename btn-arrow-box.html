@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>有按钮有箭头轮播图</title>
+	<style>
+		/*公共类*/
+		html,body,div,ul,ol,li,a,img {
+			margin:0;
+			padding:0;
+		}
+		.clearfix:before,.clearfix:after {
+			content:'';
+			display:table;
+		}
+		.clearfix:after {
+			clear:both;
+		}
+		.clearfix {
+			*zoom:1;/*IE67*/
+		}
+		ol,ul {
+			list-style:none;
+		}
+		/*图片*/
+		body {
+			background:skyblue;
+		}
+		.box {
+			width: 520px;
+			height: 280px;
+			position:relative;
+			margin:50px auto;
+			overflow:hidden;
+		}
+		.imgs {
+			position:absolute;
+			width: 9999px;
+		}
+		.imgs li {
+			float:left;
+		}
+		/*小按钮*/
+		.navs {
+			position:absolute;
+			bottom:10px;
+			right:10px;
+		}
+		.navs li {
+			width: 20px;
+			height: 20px;
+			text-align: center;
+			font:normal 12px/20px "microsoft yahei";
+			color:#aaa;
+			background:rgba(0,0,0,.7);
+			float:left;
+			margin-right:5px;
+			cursor:pointer;
+			border-radius:50%;/*去掉或不支持：方块按钮*/
+		}
+		.navs li.current {
+			background:rgba(0,0,0,1);
+			color:#fff;
+		}
+		/*箭头*/
+		.arrow {
+			display:none;
+		}
+		.box:hover .arrow {
+			display:block;
+		}
+		.arrow > div {
+			position:absolute;
+			top:50%;
+			margin-top:-25px;
+			width: 30px;
+			height: 50px;
+			background:rgba(0,0,0,.7);
+			text-align:center;
+			font:bold 20px/50px "黑体";
+			color:#aaa;
+			cursor:pointer;
+		}
+		.arrow .left {
+			left:0;
+		}
+		.arrow .right {
+			right:0;
+		}
+	</style>
+</head>
+<body>
+	<div id="box" class="box">
+		<ul id="imgs" class="imgs clearfix">
+		<!-- 可以任意改变数量 -->
+			<li><a href="#"><img src="img/1.jpg" alt="图片1"></a></li>
+			<li><a href="#"><img src="img/2.jpg" alt="图片2"></a></li>
+			<li><a href="#"><img src="img/3.jpg" alt="图片3"></a></li>
+			<li><a href="#"><img src="img/4.jpg" alt="图片4"></a></li>
+			<li><a href="#"><img src="img/5.jpg" alt="图片5"></a></li>
+		</ul>
+		<ol id="navs" class="navs clearfix">
+		</ol>
+		<div id="arrow" class="arrow">
+			<div id="left" class="left">&lt;</div>
+			<div id="right" class="right">&gt;</div>
+		</div>
+	</div>
+	<script>
+		window.onload = function(){
+			// 获取元素
+			var box = document.getElementById("box");
+			var imgs = document.getElementById("imgs");
+			var navs = document.getElementById("navs");
+			var arrow = document.getElementById("arrow");
+			var ulis = imgs.children;
+			//图片li数量
+			var num = ulis.length;
+			//左右箭头
+			var arrs = arrow.children;
+			var left = document.getElementById("left");
+			var right = document.getElementById("right");
+			//图片宽度
+			var uliw = ulis[0].offsetWidth;
+			//当前显示的图片的坐标
+			var iid = 0;
+			//当前显示的小按钮的坐标
+			var nid = 0;
+			//图片播放计时器
+			var timer = null;
+			//无缝拼接第一幅图
+			var first = ulis[0].cloneNode(true);
+			imgs.appendChild(first);
+			//动态生成小按钮
+			for(var i = 0;i < num; i++){
+				var oli=document.createElement("li");
+				oli.innerHTML = i + 1;
+				navs.appendChild(oli);
+			}
+			navs.children[0].className="current";
+			//鼠标悬浮箭头
+			for(var i = 0;i < arrs.length; i++){
+				// 悬浮箭头时样式变化
+				arrs[i].onmouseover = function(){
+					this.style.background = "rgba(0,0,0,1)";
+					this.style.color = "#fff";
+				}
+				arrs[i].onmouseout = function(){
+					this.style.background = "rgba(0,0,0,.7)";
+					this.style.color = "#aaa";
+				}
+			}
+			//鼠标点击箭头
+			right.onclick = function(){
+				if(iid >= num){
+					iid = 0;
+					imgs.style.left = 0;
+				}
+				if(nid >= num-1){
+					nid = -1;
+				}
+				iid++;
+				nid++;
+				//小按钮排他
+				currentNav(olis[nid]);
+				//图片滚动
+				animate(imgs,-iid*uliw);
+			} 
+			left.onclick = function(){
+				if(iid <= 0){
+					iid = num;
+					imgs.style.left = -uliw * iid + "px";
+				}
+				if(nid <= 0){
+					nid = num;
+				}
+				iid--;
+				nid--;
+				//小按钮排他
+				currentNav(olis[nid]);
+				//图片滚动
+				animate(imgs,-iid*uliw);
+			}
+			//图片play
+			play();
+			function play(){
+				clearInterval(timer);
+				timer = setInterval(function(){
+					right.onclick();
+				},1000);
+			}
+			//悬浮小按钮
+			var olis = navs.children;
+			for(var i = 0;i < olis.length; i++){
+				olis[i].index = i;
+				olis[i].onmouseover = function(){
+					currentNav(this);
+					//停止播放
+					// clearInterval(timer);
+					//显示当前图片
+					iid = this.index;
+					nid = this.index;
+					currentNav(olis[nid]);
+					animate(imgs,-iid*uliw);
+				}
+				olis[i].onmouseout = function(){
+					//继续播放
+					play();
+				}
+			}
+			//悬浮盒子 
+			box.onmouseover = function(){
+				clearInterval(timer);
+			}
+			box.onmouseout = function(){
+				play();
+			}
+			//封装匀速动画
+			function animate(obj,target){
+				clearInterval(obj.timer);
+				obj.timer = setInterval(function(){
+					var leader = obj.offsetLeft;
+					var step = 20;
+					step = leader > target ? -step : step;
+					leader += step;
+					if(Math.abs(leader - target) > Math.abs(step)){
+						obj.style.left = leader + "px";
+					}else {
+						obj.style.left = target + "px";
+						clearInterval(obj.timer);
+					}
+				},15);
+			}
+			//封装小按钮排他过程
+			function currentNav(nav){
+				//排他
+				for(var i=0;i<olis.length;i++){
+					olis[i].className="";
+				}
+				//留我
+				nav.className="current";
+			}
+		}
+	</script>
+</body>
+</html>
