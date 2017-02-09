@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>长盒中的无缝滚动</title>
+	<style>
+	/*公共类*/
+	html,body,div,ul,li,a,img {
+		margin:0;
+		padding:0;
+	}
+	.clearfix:before,.clearfix:after {
+		content:'';
+		display:table;
+	}
+	.clearfix:after {
+		clear:both;
+	}
+	.clearfix {
+		*zoom:1;/*IE67*/
+	}
+	/*长盒*/
+	.container {
+		width: 1200px;
+		height: 170px;
+		padding:5px;
+		border:1px solid #ccc;
+		margin:50px auto;
+	}
+	.box {
+		width: 1200px;/*宽度可以随意改变*/
+		height: 170px;
+		position:relative;
+		overflow:hidden;
+	}
+	.box ul {
+		position:absolute;
+		list-style:none;
+		width: 9999px;
+	}
+	.box li {
+		float:left;
+	}
+	</style>
+</head>
+<body>
+<!-- 
+	container:提供padding和border，容器效果
+	box:提供滚动视图的宽高
+	ul:滚动对象
+	图片数量任意，原则：排列后宽度大于盒子宽度
+ -->
+	<div class="container">
+		<div id="box" class="box">
+			<ul class="clearfix">
+				<li><a href="#"><img src="img/01.jpg" alt="图片1"></a></li>
+				<li><a href="#"><img src="img/02.jpg" alt="图片2"></a></li>
+				<li><a href="#"><img src="img/03.jpg" alt="图片3"></a></li>
+				<li><a href="#"><img src="img/04.jpg" alt="图片4"></a></li>
+				<li><a href="#"><img src="img/05.jpg" alt="图片5"></a></li>
+			</ul>
+		</div>
+	</div>
+	<script>
+		window.onload=function(){
+			var box = document.getElementById("box");
+			var ul = box.children[0];
+			var first = ul.children[0];
+			var lis = ul.children;
+			//滚动 间隔计时器
+			var timer;
+			//li元素的宽度
+			var liw=first.offsetWidth;
+			//盒子宽度
+			var boxw = box.clientWidth;
+			//原始li数量
+			var onum = ul.children.length;
+			//应该拼接的图的数量
+			var num = Math.ceil(boxw / liw);			
+			//无缝拼接
+			for(var i = 0;i < num; i++){
+				var li = lis[i].cloneNode(true);
+				ul.appendChild(li);
+			}
+			/**
+			*JS实现方法：间隔计时器+迈步
+			**/
+			//一直移动
+			play();
+			//悬停时停止移动
+			box.onmouseover = function(){
+				clearInterval(timer);
+			}
+			box.onmouseout = function(){
+				play();
+			}
+			function play(){
+				timer = setInterval(function(){
+					var leader=ul.offsetLeft;
+					var target = leader - 15;
+					if(Math.abs(target) >= liw*onum){
+						target = 0;
+					}
+					ul.style.left = target + "px";
+				},30);				
+			}
+
+			/*
+			 *	h5c3实现方法：keyframes动画
+			 *	缺点：不能随意添加图片，ul原始图片总宽度一定（在@keyframes的to中用到）
+			 */
+
+		}
+	</script>
+</body>
+</html>
