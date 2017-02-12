@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	body,div,ul,li,a {
+		margin:0;
+		padding:0;
+	}
+	.box {
+		width: 490px;
+		height: 170px;
+		margin:100px auto;
+		position:relative;	
+	}
+	.imgs {
+		list-style:none;
+		height: 100%;
+		transform-style:preserve-3d;
+		transition:all 1s;
+	}
+	.box li {
+		position:absolute;
+		width: 100%;
+		height: 100%;
+	}
+	.box a {
+		position:absolute;
+		width: 50px;
+		height: 30px;
+		background:gray;
+		color:white;
+		font:bold 20px/30px "aria";
+		text-align:center;
+		text-decoration: none;
+		top:50%;
+		margin-top:-15px;
+	}
+	.box a:nth-of-type(1) {
+		left:-50px;
+	}
+	.box a:nth-of-type(2) {
+		right:-50px;
+	}
+	li:nth-child(1){
+		background:url("img/01.jpg") no-repeat center;
+		transform:rotateX(0) translateZ(85px);
+	}
+	li:nth-child(2){
+		background:url("img/02.jpg") no-repeat center;
+		transform:rotateX(90deg) translateZ(85px);
+	}
+	li:nth-child(3){
+		background:url("img/03.jpg") no-repeat center;
+		transform:rotateX(180deg) translateZ(85px);
+	}
+	li:nth-child(4){
+		background:url("img/04.jpg") no-repeat center;
+		transform:rotateX(270deg) translateZ(85px);
+	}
+	</style>
+</head>
+<body>
+	<div class="box">
+		<ul class="imgs">
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+		<a href="javascript:void(0);">&lt;</a>
+		<a href="javascript:void(0);">&gt;</a>
+	</div>
+	<script>
+		window.onload = function(){
+			// 找元素
+			var box = document.querySelector(".box");
+			var imgs = document.querySelector(".imgs");
+			var btns = document.querySelectorAll("a");
+			// 全局变量，记录点击次数
+			var num = 0;
+			//全局变量，点击节流阀
+			var clickable = true;
+			// 点击左箭头
+			btns[0].onclick = function(){
+				if(clickable){
+					clickable = false; // 关闭 点击节流阀
+					num--;
+					imgs.style.transform = "rotateX(" + 90*num + "deg)";
+					// 动画执行完后 打开 点击节流阀
+					setTimeout(function(){
+						clickable = true;
+					},1000);
+				}
+			}
+			// 点击右箭头
+			btns[1].onclick = function(){
+				if(clickable){
+					clickable = false; // 关闭 点击节流阀
+					num++;
+					imgs.style.transform = "rotateX(" + 90*num + "deg)";
+					// 动画执行完后 打开 点击节流阀
+					setTimeout(function(){
+						clickable = true;
+					},1000);
+				}
+			}
+		}
+	</script>
+</body>
+</html>
